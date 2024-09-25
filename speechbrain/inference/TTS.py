@@ -576,27 +576,27 @@ class FastSpeech2(Pretrained):
         pitch : torch.Tensor
         energy : torch.Tensor
         """
-        with torch.no_grad():
-            (
-                _,
-                post_mel_outputs,
-                durations,
-                pitch,
-                _,
-                energy,
-                _,
-                _,
-            ) = self.hparams.model(
-                tokens_padded,
-                pace=pace,
-                pitch_rate=pitch_rate,
-                energy_rate=energy_rate,
-            )
+        # with torch.no_grad():
+        (
+            _,
+            post_mel_outputs,
+            durations,
+            pitch,
+            _,
+            energy,
+            _,
+            mel_lens,
+        ) = self.hparams.model(
+            tokens_padded,
+            pace=pace,
+            pitch_rate=pitch_rate,
+            energy_rate=energy_rate,
+        )
 
-            # Transposes to make in compliant with HiFI GAN expected format
-            post_mel_outputs = post_mel_outputs.transpose(-1, 1)
+        # Transposes to make in compliant with HiFI GAN expected format
+        post_mel_outputs = post_mel_outputs.transpose(-1, 1)
 
-        return post_mel_outputs, durations, pitch, energy
+        return post_mel_outputs, durations, pitch, energy, mel_lens
 
     def forward(self, text, pace=1.0, pitch_rate=1.0, energy_rate=1.0):
         """Batch inference for a tensor of phoneme sequences

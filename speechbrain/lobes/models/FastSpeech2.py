@@ -826,8 +826,10 @@ def upsample(feats, durs, pace=1.0, padding_value=0.0):
     predict_durations: torch.Tensor
         predicted durations for each token
     """
+    if isinstance(pace, float):
+        pace = torch.tensor(pace).view(1, 1).expand(len(durs), -1).to(feats.device)
     upsampled_mels = [
-        torch.repeat_interleave(feats[i], (pace * durs[i]).long(), dim=0)
+        torch.repeat_interleave(feats[i], (pace[i] * durs[i]).long(), dim=0)
         for i in range(len(durs))
     ]
 
